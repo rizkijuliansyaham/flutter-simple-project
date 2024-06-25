@@ -89,7 +89,7 @@ class _UserListScreenState extends State<UserListScreen> {
           final nameController = TextEditingController();
           final jobController = TextEditingController();
           userProvider.resetDataString();
-          
+
           showDialog(
             context: context,
             builder: (context) {
@@ -100,6 +100,7 @@ class _UserListScreenState extends State<UserListScreen> {
                     TextField(
                       controller: nameController,
                       decoration: InputDecoration(labelText: 'Name'),
+                      textInputAction: TextInputAction.next,
                     ),
                     SizedBox(
                       height: 16,
@@ -107,6 +108,12 @@ class _UserListScreenState extends State<UserListScreen> {
                     TextField(
                       controller: jobController,
                       decoration: InputDecoration(labelText: 'Job'),
+                      textInputAction: TextInputAction.done,
+                      onEditingComplete: () {
+                        final newUser = UserModel(
+                            name: nameController.text, job: jobController.text);
+                        userProvider.testPostData(newUser);
+                      },
                     ),
                     SizedBox(
                       height: 16,
@@ -120,7 +127,6 @@ class _UserListScreenState extends State<UserListScreen> {
                                     name: nameController.text,
                                     job: jobController.text);
                                 userProvider.testPostData(newUser);
-                                // Navigator.pop(context);
                               },
                               child: Text('Submit')),
                           SizedBox(
