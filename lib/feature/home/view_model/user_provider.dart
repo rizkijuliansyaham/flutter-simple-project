@@ -7,9 +7,14 @@ class UserProvider extends ChangeNotifier {
   List<UserModel> _users = [];
   int page = 1;
   bool _isLoading = false;
+  bool _isDataLoading = false;
+
+  String _dataResult = '';
 
   List<UserModel> get users => _users;
+  String get dataResult => _dataResult;
   bool get isLoading => _isLoading;
+  bool get isDataLoading => _isDataLoading;
 
   UserProvider(){
     fetchUsers();
@@ -41,22 +46,28 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addUser(UserModel user) async {
+  Future<void> testPostData(UserModel user) async {
+    _isDataLoading = true;
+    _dataResult = '';
+    notifyListeners();
     final response = await http.post(
-      Uri.parse(' https://reqres.in/api/users'),
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: json.encode({
-        'name': user.name,
-        'email': user.email,
-      }),
+      Uri.parse('https://reqres.in/api/users'),
+      body: user.tojson(),
     );
 
     if (response.statusCode == 201) {
-      UserModel newUser = UserModel.fromJson(json.decode(response.body));
-      _users.insert(0, newUser);
+      _isDataLoading = false;
+      _dataResult = JsonEncoder.withIndent('  ').convert(json.decode(response.body));
       notifyListeners();
     } else {
-      throw Exception('Failed to create user');
+      _isDataLoading = false;
+      throw Exception('Failed to test post');
     }
   }
+
+  void resetDataString() {
+    _dataResult = ' ';
+    notifyListeners();
+  }
+  
 }
